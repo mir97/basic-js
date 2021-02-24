@@ -2,56 +2,39 @@ const CustomError = require("../extensions/custom-error");
 
 module.exports = function transform(arr)
 {
-  
-  let mas= arr;
-  for(i=0;i<arr.length;i++){
-
-      if(arr[i]=='--discard-prev'){
-        if(mas[i-1]!=undefined){
-          delete mas[i];
-          delete mas[i-1];
-        }
-        else{
-          delete mas[i];
-        }
-      
-      }
-
-      if(arr[i]=='--discard-next'){
-        if(mas[i+1]!=undefined){
-          delete mas[i];
-          delete mas[i+1];
-        }
-        else{
-          delete mas[i];
-        }
-  
-      }
-
-      if(arr[i]=='--double-next'){
-        if(mas[i+1]!=undefined){
-          mas[i]=mas[i+1];
-        }
-        else{
-          mas.splice(i,1);
-        }
-       
-      }
-
-      if(arr[i]=='--double-prev'){
-        if(mas[i-1]!=undefined){
-          mas[i]=mas[i-1]
-        }
-        else{
-          mas.splice(i,1);
-        }
-      
-      }
-
+    if (!Array.isArray(arr)) {
+      throw new Error('not an Array!');
     }
-    
-    return  mas.filter(Boolean);
-  }
+
+    let mas = [];
+
+    for(i=0;i<arr.length;i++){
+      if (arr[i] === '--discard-next'){
+        if (arr[i+2] === '--discard-prev' || arr[i+2] === '--double-prev') {
+          i+=1;
+        }
+        i+=1;
+      }
+      else if(arr[i]=='--double-next'){
+        if (arr[i+1] !== undefined) {
+          mas.push(arr[i+1]);
+        }
+      }
+      else if (arr[i] === '--double-prev') {
+        if (mas.length > 0){
+          mas.push(mas[mas.length - 1]);
+        }
+      }
+      else if(arr[i]=="--discard-prev"){
+        mas.pop();
+      }
+      else if(arr[i]!=undefined){
+        mas.push(arr[i]);
+      }
+    }
+
+    return mas;
+}
 
 
 
